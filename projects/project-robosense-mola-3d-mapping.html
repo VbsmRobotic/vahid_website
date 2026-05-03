@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>3D Mapping Demo (RoboSense + MOLA) | Vahid Behtaji PhD Autonomy Scientist</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="../index.html">Vahid Behtaji PhD Autonomy Scientist</a>
+        <nav class="site-nav">
+          <a href="../index.html#hero">Home</a>
+          <a href="../index.html#about">About</a>
+          <a href="../index.html#experience">Experience</a>
+          <a href="../index.html#portfolio">Projects</a>
+          <a href="../index.html#publications">Publications</a>
+          <a href="../index.html#insights">Insights</a>
+          <a href="../index.html#endorsements">Endorsements</a>
+          <a href="../index.html#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <p class="meta">
+            <a href="../index.html#hero">Home</a> / 3D Mapping Demo (RoboSense + MOLA)
+          </p>
+          <p class="portfolio-tag">Perception Systems</p>
+          <h1>3D Mapping Demo (RoboSense Ground-Filtered LiDAR + MOLA LiDAR Odometry)</h1>
+          <p class="lead">
+            End-to-end LiDAR mapping pipeline integrating RoboSense sensing, ground-aware
+            preprocessing, and MOLA scan-to-map odometry to generate consistent metric 3D
+            reconstructions in real operational environments.
+          </p>
+          <article class="card">
+            <img
+              class="portfolio-image"
+              src="../projects/robosense-mola-mapping-demo.png"
+              alt="Ground-filtered LiDAR map reconstruction visualized in MM Viewer"
+            />
+          </article>
+          <article class="card">
+            <p class="meta">Perception Systems · LiDAR Mapping · RoboSense + MOLA</p>
+            <p class="inline-note">
+              RoboSense, Ground Filtering, MOLA, GICP, Point Cloud, Odometry, 3D Reconstruction
+            </p>
+            <p class="inline-note">
+              <a
+                href="https://www.youtube.com/watch?v=sQs-87amJwk"
+                target="_blank"
+                rel="noopener noreferrer"
+                >YouTube - 3D Mapping Demo (RoboSense + MOLA)</a
+              >
+            </p>
+          </article>
+          <article class="card" style="margin-top: 0.9rem">
+            <h3>Project Overview</h3>
+            <p>
+              This demonstration presents a production-oriented mapping workflow that transforms
+              recorded LiDAR sequences into analyzable metric maps. The pipeline is structured for
+              repeatability, with explicit preprocessing and odometry stages to preserve geometric
+              consistency across the full trajectory.
+            </p>
+
+            <h3 style="margin-top: 0.9rem">What the Demo Shows</h3>
+            <ul>
+              <li>Incremental 3D environment reconstruction from RoboSense LiDAR observations.</li>
+              <li>
+                Ground-filtered point-cloud processing that reduces floor-dominant clutter and
+                improves structural interpretability.
+              </li>
+              <li>Trajectory estimation with stable keyframe-based map accumulation.</li>
+              <li>Offline conversion from mapping artifacts to finalized metric map products.</li>
+            </ul>
+
+            <h3 style="margin-top: 0.9rem">Technical Highlights</h3>
+            <ul>
+              <li><strong>Sensor input:</strong> RoboSense LiDAR point-cloud stream.</li>
+              <li>
+                <strong>Preprocessing:</strong> explicit ground filtering applied prior to odometry to
+                suppress dominant planar returns and increase feature saliency for registration.
+              </li>
+              <li>
+                <strong>Odometry engine:</strong> MOLA, configured with a GICP-based LiDAR odometry
+                pipeline for robust scan-to-map alignment.
+              </li>
+              <li>
+                <strong>Data flow:</strong> recording -&gt; raw point-cloud extraction -&gt; ground filtering
+                -&gt; MOLA odometry/mapping -&gt; map conversion -&gt; visualization/inspection.
+              </li>
+              <li>
+                <strong>Output artifacts:</strong> keyframe map (`.simplemap`) and processed metric map
+                (`.mm`) for downstream consumption.
+              </li>
+            </ul>
+
+            <h3 style="margin-top: 0.9rem">Why It Matters</h3>
+            <p>
+              The workflow provides a reliable baseline for digital-twin generation, autonomy stack
+              preparation, and repeatable site mapping in structured and semi-structured
+              environments where map quality and trajectory consistency are operationally critical.
+            </p>
+          </article>
+          <p class="inline-note">
+            <a href="project-ship-scanning.html">Previous Project</a> ·
+            <a href="project-autonomous-trucks.html">Next Project</a>
+          </p>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,3 @@
+# Large local media (do not publish via git)
+projects/*.mp4
+projects/*.mkv

@@ -1,0 +1,48 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Write contact form n8n webhook config
+        env:
+          N8N_CONTACT_WEBHOOK_URL: ${{ secrets.N8N_CONTACT_WEBHOOK_URL }}
+        run: node scripts/write-contact-webhook-config.mjs
+      - name: Contact form — config hint
+        run: |
+          if [ -z "${{ secrets.N8N_CONTACT_WEBHOOK_URL }}" ]; then
+            echo "::notice::Set repository secret N8N_CONTACT_WEBHOOK_URL so the contact form works on the published site."
+          else
+            echo "N8N_CONTACT_WEBHOOK_URL is set; contact-config.js was regenerated for this deploy."
+          fi
+          if grep -q 'yourname\.app\.n8n\.cloud' js/contact-config.js 2>/dev/null; then
+            echo "::warning::The webhook secret looks like the documentation example URL. Edit the secret and paste your real n8n Production Webhook URL from your n8n account."
+          fi
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: "."
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

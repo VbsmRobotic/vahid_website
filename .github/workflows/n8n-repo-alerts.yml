@@ -1,0 +1,24 @@
+name: Notify n8n (repo alerts)
+
+on:
+  workflow_run:
+    workflows: ["Deploy GitHub Pages"]
+    types: [completed]
+  pull_request:
+    branches: [main]
+    types: [opened, reopened]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Send alert to n8n
+        env:
+          N8N_REPO_ALERT_WEBHOOK_URL: ${{ secrets.N8N_REPO_ALERT_WEBHOOK_URL }}
+        run: python3 scripts/send_n8n_repo_alert.py

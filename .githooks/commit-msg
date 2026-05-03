@@ -1,0 +1,14 @@
+#!/bin/sh
+# Runs after Cursor / git --trailer adds "Co-authored-by: Cursor <cursoragent@cursor.com>".
+# Removes Cursor attribution from the final commit message file.
+COMMIT_MSG_FILE=$1
+[ -n "$COMMIT_MSG_FILE" ] && [ -f "$COMMIT_MSG_FILE" ] || exit 0
+
+sed -i \
+  '/^Co-authored-by:.*cursoragent/d' \
+  '/^Co-authored-by:.*[Cc]ursor </d' \
+  '/^Co-authored-by:.*[Cc]ursor$/d' \
+  '/^Made-with: Cursor/d' \
+  "$COMMIT_MSG_FILE" 2>/dev/null || true
+
+exit 0

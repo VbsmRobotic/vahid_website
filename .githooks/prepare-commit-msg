@@ -1,0 +1,14 @@
+#!/bin/sh
+# Removes Cursor attribution from the commit message before it is finalized.
+# Enabled when: git config core.hooksPath .githooks (run once in this repo).
+
+COMMIT_MSG_FILE=$1
+[ -n "$COMMIT_MSG_FILE" ] && [ -f "$COMMIT_MSG_FILE" ] || exit 0
+
+# GNU sed (Linux) — same patterns as commit-msg (trailers may appear in either hook phase)
+sed -i \
+  '/^Co-authored-by:.*cursoragent/d' \
+  '/^Co-authored-by:.*[Cc]ursor </d' \
+  '/^Co-authored-by:.*[Cc]ursor$/d' \
+  '/^Made-with: Cursor/d' \
+  "$COMMIT_MSG_FILE" 2>/dev/null || true
