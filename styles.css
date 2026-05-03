@@ -72,6 +72,48 @@ body {
   color: var(--primary);
 }
 
+.visitor-badge-cluster {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+@media (min-width: 1024px) {
+  .visitor-badge-cluster {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.85rem 1rem;
+  }
+}
+
+.visitor-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--muted);
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem 0.2rem 0.45rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  max-width: min(100vw - 2rem, 220px);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.visitor-badge__icon {
+  display: flex;
+  color: var(--primary);
+  opacity: 0.9;
+  flex-shrink: 0;
+}
+
 .hero {
   padding: 5rem 0 2.6rem;
   background: linear-gradient(150deg, #f7fbff 0%, #ebf2fb 100%);
