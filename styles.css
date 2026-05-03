@@ -54,6 +54,7 @@ body {
   text-decoration: none;
   font-weight: 800;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .brand-degree {
@@ -219,6 +220,7 @@ h1 {
 .profile-card {
   border-radius: 16px;
   padding: 1.2rem;
+  container-type: inline-size;
 }
 
 .profile-photo {
@@ -234,7 +236,15 @@ h1 {
 
 .profile-card h2 {
   margin: 0 0 0.4rem;
-  font-size: 1.25rem;
+  white-space: nowrap;
+  /* vw fallback when container query lengths are unavailable */
+  font-size: clamp(0.62rem, 2.85vw, 1.25rem);
+}
+
+@supports (font-size: 1cqi) {
+  .profile-card h2 {
+    font-size: clamp(0.62rem, 5.4cqi + 0.2rem, 1.25rem);
+  }
 }
 
 .profile-card ul {
