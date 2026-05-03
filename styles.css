@@ -53,6 +53,17 @@ body {
   color: var(--text);
   text-decoration: none;
   font-weight: 800;
+  white-space: nowrap;
+}
+
+.brand-degree {
+  font-size: 0.68em;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  margin: 0 0.12em;
+  vertical-align: baseline;
+  position: relative;
+  top: -0.04em;
 }
 
 .site-nav {
