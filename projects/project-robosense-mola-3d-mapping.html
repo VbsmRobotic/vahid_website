@@ -109,21 +109,11 @@
             <p>
               In tooling terms, that archive is what you save as a <strong>simple map</strong>
               (<code>*.simplemap</code>): poses in <code>SE(3)</code> linked to observations, not a single frozen
-              geometry product. The schematic below summarizes this design rationale (conceptual
-              summary; see the paper for full definitions and experiments).
+              geometry product. Formal definitions, figures, and large-scale experiments are in
+              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >arXiv:2407.20465</a
+              >.
             </p>
-            <figure style="margin: 0.75rem 0 0">
-              <img
-                class="portfolio-image"
-                src="../projects/mola-paper-view-based-maps.png"
-                alt="Concept: view-based maps retain keyframed sensor observations for later metric map generation"
-                style="max-width: 100%; height: auto"
-              />
-              <figcaption class="inline-note" style="margin-top: 0.5rem; font-size: 0.9rem">
-                Figure (concept). View-based / simple maps preserve keyed observations so <em>posterior</em>
-                metric products can be generated offline for different tasks.
-              </figcaption>
-            </figure>
 
             <h3 style="margin-top: 0.9rem">
               Step 2 — Session archive vs. metric product: <code>.simplemap</code> and <code>.mm</code>
@@ -210,23 +200,11 @@
               <em>local map</em>, not only against the previous sweep—this stabilizes tracking when
               frame-to-frame geometry is weak. Registration often uses <strong>GICP-class</strong> or
               surface-aware objectives so structured environments contribute informative constraints.
+              Block diagrams and optimizer details are in
+              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >arXiv:2407.20465</a
+              >.
             </p>
-            <figure style="margin: 0.75rem 0 0">
-              <img
-                class="portfolio-image"
-                src="../projects/mola-paper-modular-icp.png"
-                alt="Concept: modular preprocessing blocks and ICP loop with robust estimation and velocity coupling"
-                style="max-width: 100%; height: auto"
-              />
-              <figcaption class="inline-note" style="margin-top: 0.5rem; font-size: 0.9rem">
-                Figure (concept). Declarative block pipelines plus an ICP-style loop with robust
-                estimation and coupled motion parameters—see
-                <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
-                  >arXiv:2407.20465</a
-                >
-                for the full technical treatment.
-              </figcaption>
-            </figure>
             <p style="margin-top: 0.75rem">
               <strong>Experiment-specific preprocessing.</strong> In our demos, <strong>ground filtering</strong> and
               <strong>resolution</strong> are engineering knobs on that front-end: suppressing dominant ground
