@@ -46,7 +46,8 @@
           <article class="card">
             <p class="meta">Perception Systems · LiDAR Mapping · RoboSense + MOLA</p>
             <p class="inline-note">
-              RoboSense, Ground Filtering, MOLA, GICP, Point Cloud, Odometry, 3D Reconstruction
+              RoboSense, Ground Filtering, LiDAR-IMU Fusion, MOLA, GICP, Point Cloud, Odometry, 3D
+              Reconstruction
             </p>
             <p class="inline-note">
               <a
@@ -54,6 +55,14 @@
                 target="_blank"
                 rel="noopener noreferrer"
                 >YouTube - 3D Mapping Demo (RoboSense + MOLA)</a
+              >
+            </p>
+            <p class="inline-note">
+              <a
+                href="https://www.youtube.com/watch?v=ZkcBDacKKe4"
+                target="_blank"
+                rel="noopener noreferrer"
+                >YouTube - Full-Resolution LiDAR + IMU Fusion (Ground Filtering Disabled)</a
               >
             </p>
           </article>
@@ -103,6 +112,31 @@
               The workflow provides a reliable baseline for digital-twin generation, autonomy stack
               preparation, and repeatable site mapping in structured and semi-structured
               environments where map quality and trajectory consistency are operationally critical.
+            </p>
+
+            <h3 style="margin-top: 0.9rem">Update: Full-Resolution LiDAR + IMU Fusion (Ground Filtering Disabled)</h3>
+            <p>
+              Follow-up run in the same environment using full-resolution RoboSense LiDAR fused with
+              IMU (motion-aware odometry), with LiDAR ground filtering disabled. This variant
+              preserves more raw detail (denser surfaces) while also retaining more floor/ground
+              returns.
+            </p>
+            <ul>
+              <li><strong>Sensor input:</strong> RoboSense LiDAR point-cloud stream + IMU.</li>
+              <li>
+                <strong>Preprocessing:</strong> ground filtering disabled (full-resolution point cloud
+                preserved).
+              </li>
+              <li><strong>Odometry engine:</strong> MOLA LiDAR-IMU scan-to-map odometry.</li>
+              <li><strong>Output artifacts:</strong> keyframe map (<code>.simplemap</code>) → metric map (<code>.mm</code>) for MM Viewer.</li>
+            </ul>
+            <p class="inline-note">
+              <a
+                href="https://www.youtube.com/watch?v=ZkcBDacKKe4"
+                target="_blank"
+                rel="noopener noreferrer"
+                >YouTube - Full-Resolution LiDAR + IMU Fusion run</a
+              >
             </p>
           </article>
           <p class="inline-note">
