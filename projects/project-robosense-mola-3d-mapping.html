@@ -32,9 +32,11 @@
           <p class="portfolio-tag">Perception Systems</p>
           <h1>3D Mapping Demo</h1>
           <p class="lead">
-            End-to-end LiDAR mapping pipeline integrating RoboSense sensing, ground-aware
-            preprocessing, and MOLA scan-to-map odometry to generate consistent metric 3D
-            reconstructions in real operational environments.
+            End-to-end 3D mapping from recorded RoboSense LiDAR using
+            <strong>MOLA</strong> (Modular Optimization for Localization and mApping): scan-to-map
+            odometry, optional ground-aware preprocessing, and optional LiDAR–IMU fusion. The same
+            site is mapped under <strong>two complementary configurations</strong> to illustrate how
+            preprocessing and inertial aiding change the final reconstruction.
           </p>
           <article class="card">
             <div
@@ -81,69 +83,97 @@
             </p>
           </article>
           <article class="card" style="margin-top: 0.9rem">
-            <h3>Project Overview</h3>
+            <h3>Project overview</h3>
             <p>
-              This demonstration presents a production-oriented mapping workflow that transforms
-              recorded LiDAR sequences into analyzable metric maps. The pipeline is structured for
-              repeatability, with explicit preprocessing and odometry stages to preserve geometric
-              consistency across the full trajectory.
+              This project documents a <strong>repeatable offline mapping workflow</strong>: ROS&nbsp;2 bag
+              recordings are turned into consistent, metric-scale 3D maps suitable for inspection,
+              localization, and downstream autonomy. The emphasis is on clear stages (preprocessing,
+              odometry, export) so results can be reproduced and compared across runs.
             </p>
 
-            <h3 style="margin-top: 0.9rem">What the Demo Shows</h3>
-            <ul>
-              <li>Incremental 3D environment reconstruction from RoboSense LiDAR observations.</li>
-              <li>
-                Ground-filtered point-cloud processing that reduces floor-dominant clutter and
-                improves structural interpretability.
-              </li>
-              <li>Trajectory estimation with stable keyframe-based map accumulation.</li>
-              <li>Offline conversion from mapping artifacts to finalized metric map products.</li>
-            </ul>
-
-            <h3 style="margin-top: 0.9rem">Technical Highlights</h3>
-            <ul>
-              <li><strong>Sensor input:</strong> RoboSense LiDAR point-cloud stream.</li>
-              <li>
-                <strong>Preprocessing:</strong> explicit ground filtering applied prior to odometry to
-                suppress dominant planar returns and increase feature saliency for registration.
-              </li>
-              <li>
-                <strong>Odometry engine:</strong> MOLA, configured with a GICP-based LiDAR odometry
-                pipeline for robust scan-to-map alignment.
-              </li>
-              <li>
-                <strong>Data flow:</strong> recording -&gt; raw point-cloud extraction -&gt; ground filtering
-                -&gt; MOLA odometry/mapping -&gt; map conversion -&gt; visualization/inspection.
-              </li>
-              <li>
-                <strong>Output artifacts:</strong> keyframe map (`.simplemap`) and processed metric map
-                (`.mm`) for downstream consumption.
-              </li>
-            </ul>
-
-            <h3 style="margin-top: 0.9rem">Why It Matters</h3>
+            <h3 style="margin-top: 0.9rem">Fundamentals: how the mapping stack works</h3>
             <p>
-              The workflow provides a reliable baseline for digital-twin generation, autonomy stack
-              preparation, and repeatable site mapping in structured and semi-structured
-              environments where map quality and trajectory consistency are operationally critical.
+              <strong>Scan-to-map LiDAR odometry.</strong> Each new scan is aligned to a growing local map
+              rather than only to the previous scan. That tends to stabilize drift and improves
+              robustness in structured environments where consecutive frames can be partially
+              degenerate.
+            </p>
+            <p>
+              <strong>GICP-class registration.</strong> MOLA is configured with a
+              generalized-ICP-style pipeline for point-cloud alignment: the optimizer exploits local
+              surface structure so walls, objects, and vertical detail contribute meaningfully to the
+              pose estimate.
+            </p>
+            <p>
+              <strong>Keyframes and map products.</strong> Selected poses and associated clouds are stored
+              as a keyframe trajectory and a <code>.simplemap</code> artifact; a further step can produce a
+              dense metric map (<code>.mm</code>) for visualization in MM Viewer or for integration with
+              other tools.
+            </p>
+            <p>
+              <strong>Optional ground filtering.</strong> Removing dominant ground returns before odometry
+              can reduce planar ambiguity (floors often dominate point counts) and can make
+              above-ground structure easier to interpret—at the cost of losing explicit floor
+              geometry in the displayed map.
+            </p>
+            <p>
+              <strong>Optional LiDAR–IMU fusion.</strong> When IMU data are available, they support motion
+              modeling and point-cloud motion compensation during mapping, which can improve
+              consistency under faster motion or when timing and distortion matter. Fusion is not a
+              substitute for good geometry, but it complements scan-to-map alignment when tuned
+              appropriately.
             </p>
 
-            <h3 style="margin-top: 0.9rem">Update: Full-Resolution LiDAR + IMU Fusion (Ground Filtering Disabled)</h3>
+            <h3 style="margin-top: 0.9rem">Two scenarios on the same site</h3>
             <p>
-              Follow-up run in the same environment using full-resolution RoboSense LiDAR fused with
-              IMU (motion-aware odometry), with LiDAR ground filtering disabled. This variant
-              preserves more raw detail (denser surfaces) while also retaining more floor/ground
-              returns.
+              To make trade-offs concrete, we ran <strong>two configurations in the same environment</strong>
+              (see the paired figures and the two demo videos above). They share the same core idea—
+              MOLA scan-to-map odometry on RoboSense data—but differ in preprocessing density and
+              whether IMU is used.
             </p>
+            <p>
+              <strong>Scenario A — Ground-filtered, downsampled LiDAR (no IMU in this path).</strong>
+              Point clouds are downsampled and ground returns are suppressed before odometry. The
+              resulting map tends to emphasize walls and objects with less floor clutter—useful for
+              clean visualization and for registration that is less dominated by large horizontal
+              planes.
+            </p>
+            <p>
+              <strong>Scenario B — Full-resolution LiDAR + IMU fusion, ground filtering disabled.</strong>
+              The full point cloud is retained and IMU measurements are fused in the MOLA LiDAR–IMU
+              pipeline. The reconstruction is typically <strong>denser</strong> and preserves ground and
+              low-level structure, which is informative for completeness but can increase visual
+              clutter compared with Scenario&nbsp;A.
+            </p>
+
+            <h3 style="margin-top: 0.9rem">Pipeline summary</h3>
             <ul>
-              <li><strong>Sensor input:</strong> RoboSense LiDAR point-cloud stream + IMU.</li>
               <li>
-                <strong>Preprocessing:</strong> ground filtering disabled (full-resolution point cloud
-                preserved).
+                <strong>Inputs:</strong> ROS&nbsp;2 bag — RoboSense <code>sensor_msgs/PointCloud2</code>; Scenario&nbsp;B
+                additionally uses <code>sensor_msgs/Imu</code> (e.g. <code>/imu/data</code>).
               </li>
-              <li><strong>Odometry engine:</strong> MOLA LiDAR-IMU scan-to-map odometry.</li>
-              <li><strong>Output artifacts:</strong> keyframe map (<code>.simplemap</code>) → metric map (<code>.mm</code>) for MM Viewer.</li>
+              <li>
+                <strong>Preprocessing:</strong> Scenario&nbsp;A — downsampling + ground filtering; Scenario&nbsp;B —
+                full resolution, no ground filter.
+              </li>
+              <li>
+                <strong>Odometry / mapping:</strong> MOLA — GICP-based scan-to-map LiDAR odometry; Scenario&nbsp;B —
+                LiDAR–IMU fusion variant.
+              </li>
+              <li>
+                <strong>Outputs:</strong> trajectory and keyframe <code>.simplemap</code>; optional export to metric
+                <code>.mm</code> for MM Viewer and downstream use.
+              </li>
             </ul>
+
+            <h3 style="margin-top: 0.9rem">Why it matters</h3>
+            <p>
+              Choosing preprocessing and sensor fusion is not cosmetic—it changes what the map
+              looks like and how well registration behaves in real buildings. A documented,
+              side-by-side workflow like this supports <strong>digital twins</strong>, field deployment of mobile
+              robots, and honest communication with stakeholders about map fidelity versus
+              interpretability.
+            </p>
           </article>
           <p class="inline-note">
             <a href="project-ship-scanning.html">Previous Project</a> ·
