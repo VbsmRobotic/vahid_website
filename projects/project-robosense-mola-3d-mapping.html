@@ -84,24 +84,59 @@
           </article>
           <article class="card" style="margin-top: 0.9rem">
             <p class="meta" style="margin-bottom: 0.75rem">
-              Read in order: each step builds on the previous one—from what MOLA stores, to how the
-              algorithm behaves, to the two demos, to the exact file flow you can reproduce.
+              Read in order: (1) the theoretical core—<strong>view-based / simple maps</strong> and why MOLA adopts
+              them; (2) how that splits into <code>.simplemap</code> vs. <code>.mm</code>; (3) modular pipelines and
+              ICP-style pose tracking; then our two field configurations and a reproducible command
+              sequence. Primary reference:
+              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >Blanco-Claraco, “A flexible framework for accurate LiDAR odometry, map manipulation, and
+                localization,” arXiv:2407.20465</a
+              >
+              (IJRR, 2025).
             </p>
 
-            <h3>Step 1 — What this project is</h3>
+            <h3>Step 1 — Core idea: view-based maps (“simple maps”)</h3>
             <p>
-              A <strong>repeatable offline workflow</strong>: ROS&nbsp;2 bag recordings → MOLA LiDAR (and optional
-              LiDAR–IMU) odometry → a keyframe <strong>simple map</strong> (<code>.simplemap</code>) → optional
-              <strong>metric map</strong> (<code>.mm</code>) for MM Viewer, localization, or export. The same physical
-              site is mapped twice with different preprocessing and sensors so you can see concrete
-              trade-offs, not just a single pretty screenshot.
+              Classical pipelines often commit early to <em>one</em> metric representation (e.g. a single
+              fused point cloud) and discard intermediate structure. The MOLA line of work defends the
+              opposite: treat a <strong>view-based map</strong>—a pose graph whose nodes carry
+              <strong>time-stamped, minimally committed sensor observations</strong> (keyframes + raw or
+              lightly structured views)—as the <strong>fundamental</strong> map object. From that archive you can
+              later synthesize <strong>task-specific metric maps</strong> (dense clouds, 2D projections,
+              occupancy-style layers, localization-centric maps) without re-running a full mapping
+              mission in the field.
             </p>
-
-            <h3 style="margin-top: 0.9rem">Step 2 — Simple map vs metric map (MOLA vocabulary)</h3>
             <p>
-              In MOLA, these are <strong>not</strong> two names for the same file. The simple map is the
-              session-level, keyframe-centric archive; the metric map is a derived, geometry-first
-              product you use for navigation and visualization.
+              In tooling terms, that archive is what you save as a <strong>simple map</strong>
+              (<code>*.simplemap</code>): poses in <code>SE(3)</code> linked to observations, not a single frozen
+              geometry product. The schematic below summarizes this design rationale (conceptual
+              summary; see the paper for full definitions and experiments).
+            </p>
+            <figure style="margin: 0.75rem 0 0">
+              <img
+                class="portfolio-image"
+                src="../projects/mola-paper-view-based-maps.png"
+                alt="Concept: view-based maps retain keyframed sensor observations for later metric map generation"
+                style="max-width: 100%; height: auto"
+              />
+              <figcaption class="inline-note" style="margin-top: 0.5rem; font-size: 0.9rem">
+                Figure (concept). View-based / simple maps preserve keyed observations so <em>posterior</em>
+                metric products can be generated offline for different tasks.
+              </figcaption>
+            </figure>
+
+            <h3 style="margin-top: 0.9rem">
+              Step 2 — Session archive vs. metric product: <code>.simplemap</code> and <code>.mm</code>
+            </h3>
+            <p>
+              Following the same distinction as in
+              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >arXiv:2407.20465</a
+              >: the <strong>simple map</strong> is the flexible, re-processable session record; a
+              <strong>metric map</strong> (<code>*.mm</code>) is a <em>derived</em>, often downsampled / layered geometric
+              artifact optimized for navigation, visualization, or a particular localization backend.
+              They answer different questions: “what did the robot observe, and where?” vs. “what
+              geometric model should the controller consume right now?”.
             </p>
             <div style="overflow-x: auto; margin: 0.75rem 0">
               <table class="inline-note" style="width: 100%; border-collapse: collapse; font-size: 0.95rem">
@@ -133,36 +168,80 @@
             </div>
             <ul>
               <li>
-                <strong>Simple map (<code>.simplemap</code>):</strong> the foundational MOLA representation—poses plus
-                observations. Save it when odometry finishes if you may want new metric exports or
-                offline analysis later.
+                <strong><code>.simplemap</code> (simple / view-based map file):</strong> serializes the mapping session—
+                keyframes with poses and attached observations—so you can re-run backends, change
+                filtering, or build <em>alternative</em> metric maps long after acquisition.
               </li>
               <li>
-                <strong>Metric map (<code>.mm</code>):</strong> produced from a simple map using
-                <strong><code>sm2mm</code></strong> (simple map → metric map), e.g. a filtered point cloud layer suitable
-                for <code>mola_lo</code>-style localization or MM Viewer.
+                <strong><code>.mm</code> (metric map):</strong> a <strong>posterior</strong> geometric product, typically obtained via
+                <strong><code>sm2mm</code></strong> (simple-map-to-metric-map) with a pipeline YAML that declares how
+                observations are fused, filtered, and exported (e.g. for MM Viewer or LiDAR
+                localization nodes).
               </li>
             </ul>
 
-            <h3 style="margin-top: 0.9rem">Step 3 — Algorithm fundamentals (what runs inside MOLA)</h3>
+            <h3 style="margin-top: 0.9rem">
+              Step 3 — Modular front-end pipelines and ICP-style pose tracking
+            </h3>
             <p>
-              <strong>Scan-to-map alignment.</strong> Incoming scans are registered against a local map, not only
-              against the previous frame—helpful when frame-to-frame motion is ambiguous.
+              The same reference framework advocates composing odometry / mapping front-ends from
+              <strong>reusable processing blocks</strong> wired in configuration (analogous to stacking layers in
+              deep learning), instead of hard-coding a monolithic preprocessor. Typical blocks
+              include <strong>motion compensation (deskewing)</strong> of rotating multi-beam scans,
+              <strong>voxel or other downsampling</strong>, <strong>spatial / self-hit filtering</strong>, and
+              <strong>map insertion</strong> into a local map representation used for registration.
             </p>
             <p>
-              <strong>GICP-style registration.</strong> The pipeline exploits local surface structure so facades
-              and 3D texture contribute to a stable pose.
+              <strong>Pose estimation</strong> is driven by an <strong>ICP-like iterative loop</strong>: build point-to-point or
+              point-to-model correspondences between the current scan and the local map, solve for
+              the aligning rigid transform, and iterate until convergence. Practical systems add
+              <strong>robust loss / kernels</strong> on residuals to down-weight outliers, inject
+              <strong>motion priors</strong> (e.g. from the previous velocity estimate) to shrink the search basin,
+              and—in the MOLA formulation emphasized in
+              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >arXiv:2407.20465</a
+              >—tightly couple <strong>linear and angular velocity</strong> estimation with that optimizer so that
+              improved velocity feeds back into better deskewing on the next frame. (Our Scenario&nbsp;B
+              additionally fuses an IMU in the full stack; the paper discusses strong LiDAR-only
+              behavior as well.)
             </p>
             <p>
-              <strong>Optional ground filtering.</strong> Suppressing dominant ground returns can sharpen
-              structure for ICP but removes explicit floor points from what you see in the cloud.
+              <strong>Scan-to-map alignment.</strong> Operationally, new scans are registered against a growing
+              <em>local map</em>, not only against the previous sweep—this stabilizes tracking when
+              frame-to-frame geometry is weak. Registration often uses <strong>GICP-class</strong> or
+              surface-aware objectives so structured environments contribute informative constraints.
             </p>
-            <p>
-              <strong>Optional LiDAR–IMU fusion.</strong> IMU supports motion priors and motion compensation;
-              it complements geometry but does not remove the need for good overlap and tuning.
+            <figure style="margin: 0.75rem 0 0">
+              <img
+                class="portfolio-image"
+                src="../projects/mola-paper-modular-icp.png"
+                alt="Concept: modular preprocessing blocks and ICP loop with robust estimation and velocity coupling"
+                style="max-width: 100%; height: auto"
+              />
+              <figcaption class="inline-note" style="margin-top: 0.5rem; font-size: 0.9rem">
+                Figure (concept). Declarative block pipelines plus an ICP-style loop with robust
+                estimation and coupled motion parameters—see
+                <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                  >arXiv:2407.20465</a
+                >
+                for the full technical treatment.
+              </figcaption>
+            </figure>
+            <p style="margin-top: 0.75rem">
+              <strong>Experiment-specific preprocessing.</strong> In our demos, <strong>ground filtering</strong> and
+              <strong>resolution</strong> are engineering knobs on that front-end: suppressing dominant ground
+              planes can sharpen constraints for ICP but removes floor structure from the displayed
+              cloud; full-resolution + IMU changes the motion model and point statistics. Both remain
+              instances of the same MOLA philosophy above.
             </p>
 
             <h3 style="margin-top: 0.9rem">Step 4 — Two scenarios we implemented (same site)</h3>
+            <p>
+              The following are <strong>empirical instantiations</strong> of the same MOLA stack on RoboSense ROS&nbsp;2
+              bags: identical venue, different front-end preprocessing and sensor fusion choices, so
+              the effect on the saved <code>.simplemap</code> / exported <code>.mm</code> is visible rather than
+              anecdotal.
+            </p>
             <p>
               <strong>Scenario A — Ground-filtered, downsampled LiDAR (no IMU on this path).</strong> Cleaner
               above-ground emphasis; less floor-dominated clutter for interpretation and registration.
