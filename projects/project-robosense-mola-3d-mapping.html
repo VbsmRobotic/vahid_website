@@ -83,50 +83,55 @@
             </p>
           </article>
           <article class="card" style="margin-top: 0.9rem">
-            <p class="meta" style="margin-bottom: 0.75rem">
-              Read in order: (1) the theoretical core—<strong>view-based / simple maps</strong> and why MOLA adopts
-              them; (2) how that splits into <code>.simplemap</code> vs. <code>.mm</code>; (3) modular pipelines and
-              ICP-style pose tracking; then our two field configurations and a reproducible command
-              sequence. Primary reference:
+            <h2 style="margin-top: 0; font-size: 1.35rem; font-weight: 600">
+              MOLA LiDAR mapping: technical overview
+            </h2>
+            <p class="meta" style="margin-top: 0.5rem">
+              Sections 1–3 follow
               <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >Blanco-Claraco, arXiv:2407.20465</a
+              >
+              (IJRR, 2025). Sections 4–5 describe this page’s RoboSense demos and operator workflow.
+            </p>
+
+            <h3 style="margin-top: 1rem">1. Core concept: view-based maps</h3>
+            <p>
+              Most traditional mapping pipelines commit early to a single metric representation—such
+              as one large fused point cloud—and discard the intermediate structure that produced it.
+              <strong>MOLA takes the opposite approach.</strong>
+            </p>
+            <p>
+              MOLA treats the <strong>view-based map</strong> (also called a <em>simple map</em>) as the primary map
+              object. A view-based map is a pose graph in which each node stores a time-stamped sensor
+              observation (a <em>keyframe</em>) together with its <code>SE(3)</code> pose, rather than a pre-fused
+              geometric product. This preserves flexibility: from one session archive you can generate
+              multiple task-specific metric maps—dense point clouds, 2D projections, occupancy grids,
+              or localization-optimized representations—without repeating field acquisition.
+            </p>
+            <blockquote
+              style="
+                margin: 0.85rem 0 0;
+                padding: 0.65rem 1rem;
+                border-left: 4px solid rgba(0, 0, 0, 0.2);
+                background: rgba(0, 0, 0, 0.04);
+                font-size: 0.95rem;
+                line-height: 1.5;
+              "
+            >
+              Formal definitions, figures, and large-scale experimental results:
+              <strong
                 >Blanco-Claraco, “A flexible framework for accurate LiDAR odometry, map manipulation, and
-                localization,” arXiv:2407.20465</a
+                localization,”</strong
+              >
+              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >arXiv:2407.20465</a
               >
               (IJRR, 2025).
-            </p>
+            </blockquote>
 
-            <h3>Step 1 — Core idea: view-based maps (“simple maps”)</h3>
+            <h3 style="margin-top: 1rem">2. File formats: <code>.simplemap</code> vs. <code>.mm</code></h3>
             <p>
-              Classical pipelines often commit early to <em>one</em> metric representation (e.g. a single
-              fused point cloud) and discard intermediate structure. The MOLA line of work defends the
-              opposite: treat a <strong>view-based map</strong>—a pose graph whose nodes carry
-              <strong>time-stamped, minimally committed sensor observations</strong> (keyframes + raw or
-              lightly structured views)—as the <strong>fundamental</strong> map object. From that archive you can
-              later synthesize <strong>task-specific metric maps</strong> (dense clouds, 2D projections,
-              occupancy-style layers, localization-centric maps) without re-running a full mapping
-              mission in the field.
-            </p>
-            <p>
-              In tooling terms, that archive is what you save as a <strong>simple map</strong>
-              (<code>*.simplemap</code>): poses in <code>SE(3)</code> linked to observations, not a single frozen
-              geometry product. Formal definitions, figures, and large-scale experiments are in
-              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
-                >arXiv:2407.20465</a
-              >.
-            </p>
-
-            <h3 style="margin-top: 0.9rem">
-              Step 2 — Session archive vs. metric product: <code>.simplemap</code> and <code>.mm</code>
-            </h3>
-            <p>
-              Following the same distinction as in
-              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
-                >arXiv:2407.20465</a
-              >: the <strong>simple map</strong> is the flexible, re-processable session record; a
-              <strong>metric map</strong> (<code>*.mm</code>) is a <em>derived</em>, often downsampled / layered geometric
-              artifact optimized for navigation, visualization, or a particular localization backend.
-              They answer different questions: “what did the robot observe, and where?” vs. “what
-              geometric model should the controller consume right now?”.
+              MOLA separates the workflow into two artifacts with different roles:
             </p>
             <div style="overflow-x: auto; margin: 0.75rem 0">
               <table class="inline-note" style="width: 100%; border-collapse: collapse; font-size: 0.95rem">
@@ -139,136 +144,201 @@
                 </thead>
                 <tbody>
                   <tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.08); vertical-align: top">
-                    <td style="padding: 0.5rem 0.75rem 0.5rem 0"><strong>Data</strong></td>
-                    <td style="padding: 0.5rem 0.75rem">Keyframes: <code>SE(3)</code> poses + linked raw / rich observations (e.g. scans)</td>
-                    <td style="padding: 0.5rem 0 0.5rem 0.75rem">Geometric layers: point maps, 2D grids, voxels, etc.</td>
+                    <td style="padding: 0.5rem 0.75rem 0.5rem 0"><strong>Contents</strong></td>
+                    <td style="padding: 0.5rem 0.75rem">
+                      <code>SE(3)</code> keyframe poses + linked raw sensor observations
+                    </td>
+                    <td style="padding: 0.5rem 0 0.5rem 0.75rem">
+                      Geometric layers: point maps, voxel grids, 2D occupancy, etc.
+                    </td>
                   </tr>
                   <tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.08); vertical-align: top">
                     <td style="padding: 0.5rem 0.75rem 0.5rem 0"><strong>Role</strong></td>
-                    <td style="padding: 0.5rem 0.75rem">Archive the mapping session; re-run backends or build <em>different</em> metric maps later</td>
-                    <td style="padding: 0.5rem 0 0.5rem 0.75rem">Deploy for localization, planning, obstacle checks, MM Viewer</td>
+                    <td style="padding: 0.5rem 0.75rem">
+                      Session archive—re-run backends or generate new metric maps at any time
+                    </td>
+                    <td style="padding: 0.5rem 0 0.5rem 0.75rem">
+                      Deployment artifact for localization, planning, or visualization
+                    </td>
                   </tr>
                   <tr style="border-bottom: 1px solid rgba(0, 0, 0, 0.08); vertical-align: top">
-                    <td style="padding: 0.5rem 0.75rem 0.5rem 0"><strong>Processing</strong></td>
-                    <td style="padding: 0.5rem 0.75rem">Structured but “raw” relative to final geometry products</td>
-                    <td style="padding: 0.5rem 0 0.5rem 0.75rem">Filtered / merged / layered for a specific task</td>
+                    <td style="padding: 0.5rem 0.75rem 0.5rem 0"><strong>Processing state</strong></td>
+                    <td style="padding: 0.5rem 0.75rem">
+                      Minimally processed; retains observational richness
+                    </td>
+                    <td style="padding: 0.5rem 0 0.5rem 0.75rem">
+                      Filtered, merged, and layered for a specific downstream task
+                    </td>
                   </tr>
                 </tbody>
               </table>
             </div>
-            <ul>
+            <p>
+              <strong><code>.simplemap</code></strong> serializes the full mapping session—poses and attached
+              observations—in a reprocessable form. You can change filtering, re-run different backends,
+              or build entirely different metric products long after acquisition.
+            </p>
+            <p>
+              <strong><code>.mm</code></strong> is a derived geometric product, typically produced by
+              <strong><code>sm2mm</code></strong> (simple-map-to-metric-map) with a pipeline YAML, optimized for a
+              specific consumer (e.g. MM Viewer or a LiDAR localization node).
+            </p>
+            <p>
+              <strong>Principle:</strong> keep one authoritative session record (<code>.simplemap</code>), then
+              generate purpose-built metric products (<code>.mm</code>) as needed.
+            </p>
+
+            <h3 style="margin-top: 1rem">3. Front-end pipeline and ICP-based pose tracking</h3>
+            <h4 style="margin: 0.75rem 0 0.35rem; font-size: 1.05rem; font-weight: 600">
+              Modular processing architecture
+            </h4>
+            <p>
+              MOLA composes odometry and mapping front-ends from reusable, configurable processing
+              blocks—similar in spirit to stacking layers in a deep learning framework. Typical blocks
+              include:
+            </p>
+            <ul style="line-height: 1.55">
               <li>
-                <strong><code>.simplemap</code> (simple / view-based map file):</strong> serializes the mapping session—
-                keyframes with poses and attached observations—so you can re-run backends, change
-                filtering, or build <em>alternative</em> metric maps long after acquisition.
+                <strong>Motion compensation (deskewing):</strong> corrects distortion in rotating multi-beam
+                LiDAR scans caused by motion during acquisition.
               </li>
               <li>
-                <strong><code>.mm</code> (metric map):</strong> a <strong>posterior</strong> geometric product, typically obtained via
-                <strong><code>sm2mm</code></strong> (simple-map-to-metric-map) with a pipeline YAML that declares how
-                observations are fused, filtered, and exported (e.g. for MM Viewer or LiDAR
-                localization nodes).
+                <strong>Downsampling:</strong> reduces point density (e.g. voxel grids) to control computational
+                cost.
+              </li>
+              <li>
+                <strong>Spatial and self-hit filtering:</strong> removes points from the platform or other
+                unreliable returns.
+              </li>
+              <li>
+                <strong>Local map management:</strong> maintains a rolling local map used as the registration
+                target.
               </li>
             </ul>
-
-            <h3 style="margin-top: 0.9rem">
-              Step 3 — Modular front-end pipelines and ICP-style pose tracking
-            </h3>
-            <p>
-              The same reference framework advocates composing odometry / mapping front-ends from
-              <strong>reusable processing blocks</strong> wired in configuration (analogous to stacking layers in
-              deep learning), instead of hard-coding a monolithic preprocessor. Typical blocks
-              include <strong>motion compensation (deskewing)</strong> of rotating multi-beam scans,
-              <strong>voxel or other downsampling</strong>, <strong>spatial / self-hit filtering</strong>, and
-              <strong>map insertion</strong> into a local map representation used for registration.
-            </p>
-            <p>
-              <strong>Pose estimation</strong> is driven by an <strong>ICP-like iterative loop</strong>: build point-to-point or
-              point-to-model correspondences between the current scan and the local map, solve for
-              the aligning rigid transform, and iterate until convergence. Practical systems add
-              <strong>robust loss / kernels</strong> on residuals to down-weight outliers, inject
-              <strong>motion priors</strong> (e.g. from the previous velocity estimate) to shrink the search basin,
-              and—in the MOLA formulation emphasized in
-              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
-                >arXiv:2407.20465</a
-              >—tightly couple <strong>linear and angular velocity</strong> estimation with that optimizer so that
-              improved velocity feeds back into better deskewing on the next frame. (Our Scenario&nbsp;B
-              additionally fuses an IMU in the full stack; the paper discusses strong LiDAR-only
-              behavior as well.)
-            </p>
-            <p>
-              <strong>Scan-to-map alignment.</strong> Operationally, new scans are registered against a growing
-              <em>local map</em>, not only against the previous sweep—this stabilizes tracking when
-              frame-to-frame geometry is weak. Registration often uses <strong>GICP-class</strong> or
-              surface-aware objectives so structured environments contribute informative constraints.
-              Block diagrams and optimizer details are in
-              <a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
-                >arXiv:2407.20465</a
-              >.
-            </p>
-            <p style="margin-top: 0.75rem">
-              <strong>Experiment-specific preprocessing.</strong> In our demos, <strong>ground filtering</strong> and
-              <strong>resolution</strong> are engineering knobs on that front-end: suppressing dominant ground
-              planes can sharpen constraints for ICP but removes floor structure from the displayed
-              cloud; full-resolution + IMU changes the motion model and point statistics. Both remain
-              instances of the same MOLA philosophy above.
-            </p>
-
-            <h3 style="margin-top: 0.9rem">Step 4 — Two scenarios we implemented (same site)</h3>
-            <p>
-              The following are <strong>empirical instantiations</strong> of the same MOLA stack on RoboSense ROS&nbsp;2
-              bags: identical venue, different front-end preprocessing and sensor fusion choices, so
-              the effect on the saved <code>.simplemap</code> / exported <code>.mm</code> is visible rather than
-              anecdotal.
-            </p>
-            <p>
-              <strong>Scenario A — Ground-filtered, downsampled LiDAR (no IMU on this path).</strong> Cleaner
-              above-ground emphasis; less floor-dominated clutter for interpretation and registration.
-            </p>
-            <p>
-              <strong>Scenario B — Full-resolution LiDAR + IMU fusion; ground filtering off.</strong> Denser
-              surfaces and full ground returns; richer but visually busier.
-            </p>
-            <p>
-              Compare the paired images and the two YouTube links above—same workflow class, different
-              knobs.
-            </p>
-
-            <h3 style="margin-top: 0.9rem">Step 5 — End-to-end workflow (what to run, in order)</h3>
+            <h4 style="margin: 0.85rem 0 0.35rem; font-size: 1.05rem; font-weight: 600">
+              Pose estimation via ICP
+            </h4>
+            <p>Pose estimation uses an ICP-style iterative registration loop:</p>
             <ol style="padding-left: 1.25rem; line-height: 1.55">
               <li>
-                <strong>Record or obtain a ROS&nbsp;2 bag</strong> with RoboSense <code>PointCloud2</code>; for Scenario&nbsp;B,
-                include time-synchronized <code>Imu</code> (e.g. <code>/imu/data</code>).
+                Build point-to-point or point-to-model correspondences between the current scan and the
+                local map.
               </li>
-              <li>
-                <strong>Preprocess (optional).</strong> Scenario&nbsp;A: downsample + ground filter before / within
-                your launch pipeline; Scenario&nbsp;B: full resolution, no ground filter.
-              </li>
-              <li>
-                <strong>Run MOLA LiDAR odometry</strong> (e.g. <code>mola_lidar_odometry</code> / <code>mola-cli</code> with your YAML)
-                to estimate trajectory and accumulate keyframes.
-              </li>
-              <li>
-                <strong>Save a simple map</strong> — output <code>*.simplemap</code> (session archive for reprocessing).
-              </li>
-              <li>
-                <strong>Optional — build a metric map:</strong> run <code>sm2mm</code> with a pipeline YAML to produce
-                <code>*.mm</code> for MM Viewer or localization stacks.
-              </li>
-              <li>
-                <strong>Optional — evaluate trajectory:</strong> export keyframe poses to TUM and plot (e.g. with
-                <code>evo</code>):
-              </li>
+              <li>Solve for the best-fit rigid transformation (rotation + translation).</li>
+              <li>Iterate until convergence.</li>
             </ol>
+            <p>Practical enhancements include:</p>
+            <ul style="line-height: 1.55">
+              <li>
+                <strong>Robust loss functions:</strong> down-weight outlier correspondences in cluttered
+                environments.
+              </li>
+              <li>
+                <strong>Motion priors:</strong> initialize using the previously estimated velocity to shrink the
+                search basin and improve convergence.
+              </li>
+              <li>
+                <strong>Velocity–deskewing coupling (MOLA-specific):</strong> linear and angular velocity
+                estimates feed back into deskewing so improved motion sharpens the next input scan.
+              </li>
+              <li>
+                <strong>Scan-to-map registration:</strong> align against a growing local map, not only the
+                previous frame—stabilizing tracking when frame-to-frame geometry is weak.
+              </li>
+              <li>
+                <strong>GICP-class objectives:</strong> surface-aware alignment for informative residuals in
+                structured environments.
+              </li>
+            </ul>
+            <p class="inline-note" style="margin-top: 0.5rem">
+              Scenario&nbsp;B below adds IMU fusion; the paper also documents strong LiDAR-only behavior
+              (<a href="https://arxiv.org/abs/2407.20465" target="_blank" rel="noopener noreferrer"
+                >arXiv:2407.20465</a
+              >).
+            </p>
+
+            <h3 style="margin-top: 1rem">4. Two experimental configurations (same site)</h3>
+            <p>
+              Both scenarios use the same MOLA stack on RoboSense ROS&nbsp;2 bags from the same location;
+              only preprocessing and fusion differ—so effects on map quality are directly observable
+              (see figures and YouTube links above).
+            </p>
+            <p><strong>Scenario A — Ground-filtered, downsampled LiDAR (no IMU)</strong></p>
+            <ul style="line-height: 1.55">
+              <li>Above-ground features emphasized; dominant floor plane suppressed.</li>
+              <li>Reduced clutter improves ICP constraint quality and interpretability.</li>
+              <li>Lower point density reduces storage and computation.</li>
+            </ul>
+            <p><strong>Scenario B — Full-resolution LiDAR + IMU fusion (no ground filtering)</strong></p>
+            <ul style="line-height: 1.55">
+              <li>Full ground-plane returns preserved alongside structure.</li>
+              <li>IMU fusion improves motion compensation and robustness under fast motion.</li>
+              <li>Denser surfaces—visually busier maps.</li>
+            </ul>
+            <p>
+              Both are valid instances of the same architecture; the difference is front-end knob
+              settings.
+            </p>
+
+            <h3 style="margin-top: 1rem">5. End-to-end workflow</h3>
+            <p>Follow these steps in order:</p>
+            <p><strong>Step 1 — Data acquisition</strong></p>
+            <p>
+              Record a ROS&nbsp;2 bag with RoboSense <code>sensor_msgs/PointCloud2</code>. For Scenario&nbsp;B, include
+              time-synchronized <code>sensor_msgs/Imu</code> (e.g. <code>/imu/data</code>).
+            </p>
+            <p><strong>Step 2 — Preprocessing</strong> <span class="inline-note">(optional, configuration-dependent)</span></p>
+            <ul style="line-height: 1.55">
+              <li><em>Scenario A:</em> downsampling and ground filtering in your launch pipeline.</li>
+              <li><em>Scenario B:</em> full-resolution data; disable ground filtering.</li>
+            </ul>
+            <p><strong>Step 3 — Run LiDAR odometry</strong></p>
+            <p>
+              Launch MOLA LiDAR odometry (e.g. <code>mola_lidar_odometry</code> / <code>mola-cli</code> with your YAML) to
+              estimate the trajectory and accumulate keyframes.
+            </p>
+            <p><strong>Step 4 — Save the simple map</strong></p>
+            <p>Output a <code>.simplemap</code> file—your reprocessable session archive.</p>
+            <p><strong>Step 5 — Build a metric map</strong> <span class="inline-note">(optional)</span></p>
+            <p>
+              Run <code>sm2mm</code> with a pipeline YAML to produce a <code>.mm</code> for MM Viewer or a localization
+              stack.
+            </p>
+            <p><strong>Step 6 — Evaluate the trajectory</strong> <span class="inline-note">(optional)</span></p>
+            <p>Export keyframe poses to TUM format and analyze with <code>evo</code>:</p>
             <pre style="overflow-x: auto; padding: 0.75rem 1rem; background: rgba(0, 0, 0, 0.06); border-radius: 6px; font-size: 0.88rem; line-height: 1.4"><code>pip3 install evo
 sm-cli export-keyframes /path/to/map.simplemap --output kfs.tum
 evo_traj tum kfs.tum -p --plot_mode=xy</code></pre>
+            <figure style="margin: 1rem 0 0">
+              <img
+                src="../projects/mola_workflow_pipeline.svg"
+                alt="Diagram: MOLA workflow from ROS 2 bag through odometry, simple map, sm2mm, and optional trajectory evaluation"
+                style="width: 100%; max-width: 100%; height: auto; display: block"
+              />
+              <figcaption class="inline-note" style="margin-top: 0.5rem; font-size: 0.9rem">
+                Workflow overview (pipeline diagram).
+              </figcaption>
+            </figure>
 
-            <h3 style="margin-top: 0.9rem">Step 6 — Why it matters</h3>
+            <h3 style="margin-top: 1rem">6. Why this architecture matters</h3>
             <p>
-              The split between <code>.simplemap</code> and <code>.mm</code> is how professional MOLA workflows stay
-              flexible: you keep one truthful session record, then mint metric products tailored to
-              navigation or visualization. Showing <strong>two scenarios</strong> on one site makes the impact of
-              preprocessing and IMU tangible for anyone evaluating map quality or deploying autonomy.
+              The <code>.simplemap</code> / <code>.mm</code> split keeps MOLA workflows maintainable and future-proof. By
+              preserving the full session as a view-based archive, teams can:
+            </p>
+            <ul style="line-height: 1.55">
+              <li>Re-run backends with new parameters without returning to the field.</li>
+              <li>
+                Generate multiple specialized metric products from one acquisition (localization map,
+                dense visualization, 2D grid).
+              </li>
+              <li>
+                Compare preprocessing choices—as in Scenarios A and B—with the same pipeline and
+                evaluation tools.
+              </li>
+            </ul>
+            <p>
+              Separating <em>what the robot observed</em> from <em>what the stack should consume</em> is the
+              defining design principle of the MOLA framework.
             </p>
           </article>
           <p class="inline-note">
