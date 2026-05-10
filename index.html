@@ -201,6 +201,13 @@
             <button
               class="filter-chip"
               type="button"
+              data-filter="3d-mapping"
+            >
+              3D Mapping &amp; Fusion
+            </button>
+            <button
+              class="filter-chip"
+              type="button"
               data-filter="perception-systems"
             >
               Perception Systems
@@ -263,30 +270,32 @@
                 ><span>Ackermann</span>
               </div>
             </article>
-            <article class="card portfolio-card" data-category="perception-systems">
+            <article class="card portfolio-card" data-category="3d-mapping">
               <a href="projects/project-robosense-mola-3d-mapping.html">
                 <img
                   class="portfolio-image"
                   src="projects/robosense-mola-mapping-demo.png"
-                  alt="Ground-filtered LiDAR map reconstruction from RoboSense and MOLA pipeline"
+                  alt="RoboSense 3D LiDAR mapping with MOLA; includes LiDAR–IMU fusion scenario"
                 />
               </a>
-              <p class="portfolio-tag">Perception Systems</p>
+              <p class="portfolio-tag">3D Mapping &amp; Sensor Fusion</p>
               <h3>3D Mapping Demo (RoboSense + MOLA)</h3>
               <p>
-                Real-world LiDAR mapping workflow with ground-aware preprocessing,
-                stable MOLA odometry, and keyframe-based map accumulation for
-                repeatable metric 3D reconstruction.
+                Metric <strong>3D LiDAR</strong> mapping with <strong>IMU</strong> in the loop:
+                ground-aware preprocessing, <strong>LiDAR–IMU fusion</strong> and scan-to-map odometry in
+                <strong>MOLA</strong>, plus keyframe-based map accumulation — a full mapping / odometry
+                stack, not a perception-only demo.
               </p>
-              <p class="meta">LiDAR Mapping Demo · RoboSense + MOLA</p>
+              <p class="meta">LiDAR–IMU mapping demo · RoboSense + MOLA</p>
               <a
                 class="inline-link"
                 href="projects/project-robosense-mola-3d-mapping.html"
                 >View Project</a
               >
               <div class="tech-pills">
-                <span>LiDAR</span><span>MOLA</span><span>GICP</span
-                ><span>Point Cloud</span><span>3D Mapping</span>
+                <span>3D LiDAR</span><span>IMU</span><span>MOLA</span
+                ><span>LiDAR–IMU fusion</span><span>GICP</span><span>Point Cloud</span
+                ><span>3D Mapping</span>
               </div>
             </article>
             <article class="card portfolio-card" data-category="perception-systems">
