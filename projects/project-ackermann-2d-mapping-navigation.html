@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2D Mapping and Navigation for Ackermann Platform | Vahid Behtaji PhD Autonomy Scientist</title>
+    <link rel="stylesheet" href="../styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container nav-wrap">
+        <a class="brand" href="../index.html"
+          ><span class="brand-primary">Vahid Behtaji <span class="brand-degree">PhD</span></span
+          ><span class="brand-tagline">Autonomy Scientist</span></a
+        >
+        <nav class="site-nav">
+          <a href="../index.html#hero">Home</a>
+          <a href="../index.html#about">About</a>
+          <a href="../index.html#experience">Experience</a>
+          <a href="../index.html#portfolio">Projects</a>
+          <a href="../index.html#publications">Publications</a>
+          <a href="../index.html#insights">Insights</a>
+          <a href="../index.html#endorsements">Endorsements</a>
+          <a href="../index.html#contact">Contact</a>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="section">
+        <div class="container">
+          <p class="meta">
+            <a href="../index.html#hero">Home</a> / 2D Mapping and Navigation for Ackermann Platform
+          </p>
+          <p class="portfolio-tag">2D Mapping and Navigation</p>
+          <h1>2D Mapping and Navigation for Ackermann Platform</h1>
+          <p class="lead">
+            A fully operational autonomous mobile robot — sensor network, teleoperation, real-time 2D
+            mapping, localisation, and indoor navigation with obstacle avoidance — integrated
+            end-to-end on a ROS 2 stack and deployed on the Ackermann chassis.
+          </p>
+          <p class="lead" style="margin-top: 0.65rem">
+            This project demonstrates that a production-grade autonomous navigation pipeline can be
+            assembled, tuned, and validated on a compact indoor platform without sacrificing
+            architectural rigour.
+          </p>
+          <article class="card">
+            <img
+              class="portfolio-image"
+              src="../projects/ackermann-2d-mapping-cover.jpg"
+              alt="Ackermann mobile robot platform with watermarked portfolio imagery"
+            />
+          </article>
+          <article class="card">
+            <p class="meta">2D Mapping and Navigation · Globoai Robotics · Indoor Ackermann Platform</p>
+            <p class="inline-note">
+              ROS 2, Nav2, SLAM Toolbox, AMCL, Costmap 2D, Qt5, Android, 2D LiDAR, IMU, IP Camera,
+              Netplan, Ackermann kinematics
+            </p>
+            <p class="inline-note">
+              <em>YouTube walkthrough — link will be added when the video is published.</em>
+            </p>
+          </article>
+          <article class="card" style="margin-top: 0.9rem">
+            <h2 style="margin-top: 0; font-size: 1.35rem; font-weight: 600">System Overview</h2>
+            <p>
+              The platform is organised into three layers: sensing, middleware, and capability
+              modules. All sensor modalities feed a single middleware layer. Three independent
+              capability modules — teleoperation, mapping and localisation, and navigation — consume
+              from that layer and converge on a unified Ackermann-aware motion driver.
+            </p>
+            <p>
+              This separation keeps each module independently testable and the overall system
+              composable. Swapping the navigation stack, for example, does not require changes to the
+              sensor or teleoperation layers.
+            </p>
+            <ul style="line-height: 1.55; margin-top: 0.75rem">
+              <li>
+                <strong>Sensing layer</strong> — IP camera (wired); 2D LiDAR (USB); IMU (USB)
+              </li>
+              <li>
+                <strong>Capability modules</strong> — Teleoperation (desktop + mobile); 2D mapping and
+                localisation; autonomous navigation with obstacle avoidance
+              </li>
+              <li><strong>Output</strong> — Ackermann motion driver (X-Protocol)</li>
+            </ul>
+
+            <figure style="margin: 1.25rem 0 0; padding: 0">
+              <svg
+                viewBox="0 0 720 312"
+                xmlns="http://www.w3.org/2000/svg"
+                role="img"
+                aria-labelledby="ackArchTitle ackArchDesc"
+                style="width: 100%; height: auto; max-height: 340px; display: block"
+              >
+                <title id="ackArchTitle">Ackermann platform software architecture</title>
+                <desc id="ackArchDesc">
+                  Sensors feed ROS 2 middleware; teleoperation, mapping and localisation, and navigation
+                  consume that layer and converge on the Ackermann motion driver.
+                </desc>
+                <defs>
+                  <style>
+                    .sense {
+                      fill: #f0f5fb;
+                      stroke: #2b5a8a;
+                      stroke-width: 2;
+                    }
+                    .mid {
+                      fill: #e8f4ef;
+                      stroke: #2d6a4f;
+                      stroke-width: 2;
+                    }
+                    .cap {
+                      fill: #f5f0fb;
+                      stroke: #5a2b8a;
+                      stroke-width: 2;
+                    }
+                    .out {
+                      fill: #fdf4e7;
+                      stroke: #b86b00;
+                      stroke-width: 2;
+                    }
+                    .lbl {
+                      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+                      font-size: 13px;
+                      font-weight: 700;
+                      fill: #1a2f45;
+                    }
+                    .sml {
+                      font-family: system-ui, -apple-system, Segoe UI, sans-serif;
+                      font-size: 11px;
+                      fill: #325271;
+                    }
+                    .arr {
+                      stroke: #325271;
+                      stroke-width: 2;
+                      fill: none;
+                      marker-end: url(#ah);
+                    }
+                  </style>
+                  <marker id="ah" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 Z" fill="#325271" />
+                  </marker>
+                </defs>
+                <rect class="sense" x="40" y="16" width="640" height="56" rx="10" />
+                <text class="lbl" x="360" y="40" text-anchor="middle">Sensing layer</text>
+                <text class="sml" x="360" y="58" text-anchor="middle">
+                  IP camera (Ethernet) · 2D LiDAR (USB) · IMU (USB) · Wi-Fi (operators)
+                </text>
+                <rect class="mid" x="120" y="96" width="480" height="48" rx="10" />
+                <text class="lbl" x="360" y="126" text-anchor="middle">Middleware — ROS 2 topics &amp; TF</text>
+                <rect class="cap" x="40" y="168" width="200" height="88" rx="10" />
+                <text class="lbl" x="140" y="198" text-anchor="middle">Teleoperation</text>
+                <text class="sml" x="140" y="218" text-anchor="middle">Qt5 desktop</text>
+                <text class="sml" x="140" y="234" text-anchor="middle">Android TCP bridge</text>
+                <rect class="cap" x="260" y="168" width="200" height="88" rx="10" />
+                <text class="lbl" x="360" y="198" text-anchor="middle">Mapping &amp; localisation</text>
+                <text class="sml" x="360" y="218" text-anchor="middle">SLAM Toolbox</text>
+                <text class="sml" x="360" y="234" text-anchor="middle">AMCL on loaded map</text>
+                <rect class="cap" x="480" y="168" width="200" height="88" rx="10" />
+                <text class="lbl" x="580" y="198" text-anchor="middle">Navigation</text>
+                <text class="sml" x="580" y="218" text-anchor="middle">Nav2 · global + local</text>
+                <text class="sml" x="580" y="234" text-anchor="middle">Costmap 2D · recovery BT</text>
+                <path class="arr" d="M140 256 L140 262 L360 262 L360 268" />
+                <path class="arr" d="M360 256 L360 268" />
+                <path class="arr" d="M580 256 L580 262 L360 262" />
+                <rect class="out" x="160" y="268" width="400" height="40" rx="10" />
+                <text class="lbl" x="360" y="294" text-anchor="middle">Ackermann motion driver (X-Protocol)</text>
+                <path class="arr" d="M360 72 L360 96" />
+                <path class="arr" d="M360 144 L360 168" />
+                <path class="arr" d="M360 144 L140 168" />
+                <path class="arr" d="M360 144 L580 168" />
+              </svg>
+              <figcaption class="inline-note" style="margin-top: 0.5rem">
+                Logical dataflow: sensing feeds a single middleware layer; teleoperation, mapping and
+                localisation, and navigation are independent capability modules that converge on the unified
+                Ackermann-aware motion driver (X-Protocol).
+              </figcaption>
+            </figure>
+
+            <h3 style="margin-top: 1.15rem">Network and Sensor Setup</h3>
+            <h4 style="margin-top: 0.65rem; font-size: 1rem; font-weight: 700">Design intent</h4>
+            <p>
+              Reliable sensor data starts with a clean network topology. The robot runs three physical
+              interfaces — wired Ethernet for the camera, USB for both the LiDAR and IMU, and Wi-Fi
+              for operator communication — each kept deliberately isolated.
+            </p>
+            <p>
+              Mixing camera traffic and operator traffic on a shared interface is a common source of
+              intermittent connectivity failures, especially when DHCP assigns addresses dynamically.
+              The platform avoids this entirely: the wired port is dedicated to the camera subnet; the
+              Wi-Fi interface is assigned a static address at the OS level, so the robot is always
+              reachable at a known address regardless of network conditions. This makes SSH access,
+              remote visualisation, and GUI forwarding reliable in field conditions.
+            </p>
+            <h4 style="margin-top: 0.75rem; font-size: 1rem; font-weight: 700">Sensor data pipeline</h4>
+            <p><strong>IP camera</strong> — Delivers a continuous RTSP stream. Exposed to the middleware as a calibrated image topic pair (raw image + camera metadata). Useful for visual inspection and as a future input for vision-based localisation.</p>
+            <p style="margin-top: 0.65rem">
+              <strong>2D LiDAR</strong> — The primary navigation sensor. Multiple scan sources are merged
+              before being forwarded to the mapping and navigation pipeline, improving angular coverage
+              and reducing blind spots inherent to a single-unit setup.
+            </p>
+            <p style="margin-top: 0.65rem">
+              <strong>IMU</strong> — Raw accelerometer and gyroscope data is passed through an orientation
+              filter before entering the stack. This step is non-optional: feeding unfiltered IMU output
+              into a navigation pipeline degrades pose estimation quality, particularly during
+              cornering, in ways that are difficult to diagnose after the fact.
+            </p>
+
+            <h3 style="margin-top: 1.15rem">Teleoperation</h3>
+            <p>
+              The platform supports two independent control modes, both available simultaneously.
+            </p>
+            <p>
+              <strong>Desktop GUI</strong> — A Qt5 application running on the onboard computer, accessible via
+              remote display forwarding. Provides direct velocity control with configurable speed limits
+              and a live connection status indicator.
+            </p>
+            <p style="margin-top: 0.65rem">
+              <strong>Android app</strong> — A TCP bridge that accepts joystick input from an Android device
+              and translates it to robot commands. No ROS installation is required on the phone, which
+              significantly lowers the barrier for operator onboarding and field use.
+            </p>
+            <p style="margin-top: 0.65rem">
+              Both modes publish to the same motion interface, meaning the operator can switch between
+              desktop and mobile control without any reconfiguration. The motion driver handles the
+              Ackermann kinematic conversion in both cases.
+            </p>
+
+            <h3 style="margin-top: 1.15rem">2D Mapping</h3>
+            <p>
+              The mapping pipeline operates in asynchronous mode, meaning the map is updated continuously
+              as new scan and odometry data arrives — without blocking the robot's motion or the
+              operator's control stream. This is important for real-time exploration: the robot can be
+              driven freely while the map builds in the background.
+            </p>
+            <p>
+              The output is an occupancy grid — a probabilistic representation of free space, occupied
+              space, and unknown regions — stored as a portable image and metadata file pair. This format
+              is directly loadable by the navigation stack without conversion, keeping the
+              mapping-to-navigation handoff clean.
+            </p>
+            <ul style="line-height: 1.55; margin-top: 0.65rem">
+              <li><strong>Inputs:</strong> 2D LiDAR scan data, wheel odometry</li>
+              <li>
+                <strong>Output:</strong> Occupancy grid map (image + metadata), exportable for navigation
+              </li>
+            </ul>
+
+            <h3 style="margin-top: 1.15rem">Localisation, Navigation and Obstacle Avoidance</h3>
+            <p>
+              Once a map is available, the platform switches from exploration mode to navigation mode. The
+              full Nav2 pipeline activates.
+            </p>
+            <h4 style="margin-top: 0.75rem; font-size: 1rem; font-weight: 700">Localisation</h4>
+            <p>
+              A particle filter localises the robot on the pre-built map by continuously comparing incoming
+              LiDAR scans against the expected scan at each candidate pose. Over successive sensor readings,
+              the particle distribution converges on the robot's actual position. Odometry data is fused
+              to propagate the estimate between scan updates, maintaining continuity during brief periods
+              of scan ambiguity (e.g. long featureless corridors).
+            </p>
+            <h4 style="margin-top: 0.75rem; font-size: 1rem; font-weight: 700">Path planning and execution</h4>
+            <p>
+              Navigation to a goal is split across two planners operating at different time horizons:
+            </p>
+            <p>
+              <strong>Global planner</strong> — Computes the optimal path from the robot's current estimated pose
+              to the goal, treating the pre-built map as ground truth. Runs at low frequency; the output
+              is a reference trajectory.
+            </p>
+            <p style="margin-top: 0.65rem">
+              <strong>Local planner</strong> — Executes the reference trajectory while reacting to real-time sensor
+              data. Continuously rebuilds a local costmap around the robot by inflating detected
+              obstacles, and computes velocity commands that keep the robot on the planned path while
+              avoiding collisions. Runs at high frequency.
+            </p>
+            <p style="margin-top: 0.65rem">
+              This two-planner architecture means the robot can navigate efficiently across a known space
+              while still responding to unexpected obstacles — a person walking across the path, a door
+              that has been closed — without replanning the entire global route.
+            </p>
+            <h4 style="margin-top: 0.75rem; font-size: 1rem; font-weight: 700">Recovery behaviours</h4>
+            <p>
+              The navigation stack includes a behaviour tree that handles failure cases automatically. If
+              the robot becomes stuck or the planned path becomes infeasible, it executes a recovery
+              sequence — typically backing up, rotating in place, and re-attempting — before escalating
+              to a full replan. This makes the system robust to the kind of transient blockages common in
+              real indoor environments.
+            </p>
+            <h4 style="margin-top: 0.75rem; font-size: 1rem; font-weight: 700">Ackermann constraint handling</h4>
+            <p>
+              Unlike differential-drive platforms, an Ackermann robot cannot rotate in place. The controller
+              configuration explicitly encodes the minimum turning radius and steering geometry of the
+              chassis. Navigation goals that would require infeasible manoeuvres are handled gracefully —
+              the planner routes around the constraint rather than issuing commands the hardware cannot
+              execute.
+            </p>
+
+            <h3 style="margin-top: 1.15rem">Built With</h3>
+            <p class="inline-note" style="margin-top: 0.5rem">
+              ROS 2 · Nav2 · SLAM Toolbox · AMCL · Costmap 2D · Qt5 · Android · 2D LiDAR · IMU · IP Camera ·
+              Netplan · Ackermann Kinematics · Indoor Navigation · Obstacle Avoidance
+            </p>
+          </article>
+          <p class="inline-note">
+            <a href="../index.html#portfolio">Back to Projects</a> ·
+            <a href="project-robosense-mola-3d-mapping.html">Next Project</a>
+          </p>
+        </div>
+      </section>
+    </main>
+    <script src="../js/ga-config.js?v=2"></script>
+    <script src="../js/ga-loader.js?v=1"></script>
+    <script src="../js/visitor-badge.js?v=1"></script>
+  </body>
+</html>
